@@ -36,13 +36,17 @@ int main(/*int argc, char** argv*/)
     for (const auto& file : std::filesystem::directory_iterator(path))
     {
 
-        image = cv::imread(file.path().string(), cv::IMREAD_COLOR); // Read the file
+        //image = cv::imread(file.path().string(), cv::IMREAD_COLOR); // Read the file
+        image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file
 
         if (!image.empty()) // Check for invalid input
         {
-            cv::Laplacian(image, eges, CV_64F);
+            /*cv::Laplacian(image, eges, CV_64F);
             cv::split(eges, splitchannels);
-            cv::hconcat(splitchannels, 3, out);
+            cv::hconcat(splitchannels, 3, out);*/
+            
+            cv::Laplacian(image, out, CV_64F);
+
             cv::meanStdDev(out, m, sd);
             
             double temp = (pow(*(double*)sd.data, 2.));
