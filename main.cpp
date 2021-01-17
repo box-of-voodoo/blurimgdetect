@@ -125,8 +125,6 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
             {
                 cout << ".";
                 auto newPath = newFolder/ key.filename();
-                cout << key << endl;
-                cout << newPath << endl;
                 std::filesystem::rename(key, newPath);
                 ++count;
             }
