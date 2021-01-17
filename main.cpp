@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-#include <vector>
+
 #include <map>
 
 //#define TIME_MEASURE
@@ -15,20 +15,39 @@
 using std::cout;
 using std::endl;
 
-int main(int argc, char** argv)
+int main(int argc, char** argv)// help,-h,-help; -r; -m;
 {
-    if (argc < 2)
+
+    int command = 0;
+    if ((argc < 2) || strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "-h") == 0)
     {
-        cout << "Not sufficient number of input arguments, program will end" << endl;
+        cout << "blurimgdetect.exe [-r||-m path_to_move] path_of_folder" << endl;
+        cout << "-r\tremove images under chosen value of variance\n"
+            << "-m\tmove images under chosen value of variance to path_to_move\n"
+            << "when only path_of_folder with images, chosen images are moved to new folder with path - path_of_folder/removed" << endl;
         return 0;
     }
+ 
+    if (strcmp(argv[1], "-r") == 0 && std::filesystem::exists(argv[2]))
+        command = 1;
+    else if (strcmp(argv[1], "-m") == 0 && std::filesystem::exists(argv[2]) && std::filesystem::exists(argv[3]))
+        command = 2;
+    else if (std::filesystem::exists(argv[1]))
+        command = 0;
+    else
+    {
+        cout << "Wrong parametrs or path doesn't exist\n"
+            << "To show help use no parametr or parametr \"-h\"" << endl;
+        return 0;
+    }
+    std::filesystem::path imgFolder(argv[command + 1]);
+    //std::string pathX = "d:/1_Kuba/fotky/x";
 
     cv::Mat image, eges;
     cv::Mat m, sd;
     cv::Mat out;// (image.rows, image.cols * image.channels(), CV_64F);
     cv::Mat splitchannels[3];
     
-    std::string path = "d:/1_Kuba/fotky/x";
     double suma = 0;
     double maxVal = DBL_MIN;
     double minVal = DBL_MAX;
@@ -36,18 +55,20 @@ int main(int argc, char** argv)
     int count = 0;
     std::vector<double> stds;
     std::map<std::filesystem::path, double> imagesStd;
-    cout << "Processing images..." << endl;
+    cout << "Processing images";
 
 #ifdef TIME_MEASURE
     auto start = std::chrono::high_resolution_clock::now();
 #endif
-    for (const auto& file : std::filesystem::directory_iterator(argv[1]))
+    for (const auto& file : std::filesystem::directory_iterator(imgFolder))
+    //for (const auto& file : std::filesystem::directory_iterator(pathX))
     {
-
+        
         image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file
 
         if (!image.empty()) // Check for invalid input
         {
+            cout << ".";
             cv::Laplacian(image, out, CV_64F);
             cv::meanStdDev(out, m, sd);
             double temp = (pow(*(double*)sd.data, 2.));
@@ -59,6 +80,7 @@ int main(int argc, char** argv)
 
 
     }
+    cout << endl;
 #ifdef TIME_MEASURE
     auto end = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -67,17 +89,53 @@ int main(int argc, char** argv)
 
     cout << "Number of photos: " << imagesStd.size() << endl;
     cout << "Max value: " << maxVal << "\tMin value: " << minVal << "\tAverage value: " << suma / imagesStd.size() << endl;
-    cout << "Remove under: ";
+    cout << "Remove/Move under: ";
     std::cin >> limit;
-    cout << "Removing photos..." << endl;
-
-    for (const auto& [key,val] : imagesStd)
+    cout << "Removing photos" << endl;
+    
+    std::filesystem::path newFolder;
+    if (command == 0)
     {
-        if (val < limit) 
-            count += std::filesystem::remove(key);
+        newFolder = imgFolder/ "removed";
+        std::filesystem::create_directory(newFolder);
+    }
+    else if (command == 2)
+    {
+        newFolder = argv[2];
     }
 
-    cout << "Photos removed: " << count << endl;
+    if (command == 1)
+    {
+        for (const auto& [key, val] : imagesStd)
+        {
+            if (val < limit)
+            {
+                cout << ".";
+                count += std::filesystem::remove(key);
+            }
+        }
+        cout << "\nPhotos removed: " << count << endl;
+
+    }
+    else
+    {
+        for (const auto& [key, val] : imagesStd)
+        {
+            if (val < limit)
+            {
+                cout << ".";
+                auto newPath = newFolder/ key.filename();
+                cout << key << endl;
+                cout << newPath << endl;
+                std::filesystem::rename(key, newPath);
+                ++count;
+            }
+        }
+        cout << "\nPhotos moved: " << count << endl;
+
+    }
+    
+
        
     return 0;
 }
