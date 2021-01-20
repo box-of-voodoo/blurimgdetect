@@ -232,15 +232,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenCV-4.2.0\opencv\buildstatic\install\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_world451d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world451d.lib;ade.lib;IlmImfd.lib;ippicvmt.lib;ippiwd.lib;ittnotifyd.lib;libjpeg-turbod.lib;libopenjp2d.lib;libpngd.lib;libprotobufd.lib;libtiffd.lib;libwebpd.lib;quircd.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenCV-4.2.0\opencv\buildstatic\install\x64\vc16\staticlib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -275,7 +275,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenCV-4.2.0\opencv\buildstatic\install\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -284,8 +284,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_world451.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world451.lib;ade.lib;IlmImf.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libjpeg-turbo.lib;libopenjp2.lib;libpng.lib;libprotobuf.lib;libtiff.lib;libwebp.lib;quirc.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenCV-4.2.0\opencv\buildstatic\install\x64\vc16\staticlib</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>

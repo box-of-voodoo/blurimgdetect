@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-
 #include <map>
 
 //#define TIME_MEASURE
@@ -17,7 +16,6 @@ using std::endl;
 
 int main(int argc, char** argv)// help,-h,-help; -r; -m;
 {
-
     int command = 0;
     if ((argc < 2) || strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "-h") == 0)
     {
@@ -27,7 +25,6 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
             << "when only path_of_folder with images, chosen images are moved to new folder with path - path_of_folder/removed" << endl;
         return 0;
     }
- 
     if (strcmp(argv[1], "-r") == 0 && std::filesystem::exists(argv[2]))
         command = 1;
     else if (strcmp(argv[1], "-m") == 0 && std::filesystem::exists(argv[2]) && std::filesystem::exists(argv[3]))
@@ -40,19 +37,17 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
             << "To show help use no parametr or parametr \"-h\"" << endl;
         return 0;
     }
-    std::filesystem::path imgFolder(argv[command + 1]);
-    //std::string pathX = "d:/1_Kuba/fotky/x";
 
+    std::filesystem::path imgFolder(argv[command + 1]);
     cv::Mat image, eges;
     cv::Mat m, sd;
-    cv::Mat out;// (image.rows, image.cols * image.channels(), CV_64F);
+    cv::Mat out;
     cv::Mat splitchannels[3];
-    
     double suma = 0;
     double maxVal = DBL_MIN;
     double minVal = DBL_MAX;
     double limit = 0;
-    int count = 0;
+    int countImg = 0;
     std::vector<double> stds;
     std::map<std::filesystem::path, double> imagesStd;
     cout << "Processing images";
@@ -63,9 +58,7 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     for (const auto& file : std::filesystem::directory_iterator(imgFolder))
     //for (const auto& file : std::filesystem::directory_iterator(pathX))
     {
-        
         image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file
-
         if (!image.empty()) // Check for invalid input
         {
             cout << ".";
@@ -77,8 +70,6 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
             maxVal = MAX(maxVal, temp);
             suma += temp;
         }
-
-
     }
     cout << endl;
 #ifdef TIME_MEASURE
@@ -91,7 +82,7 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     cout << "Max value: " << maxVal << "\tMin value: " << minVal << "\tAverage value: " << suma / imagesStd.size() << endl;
     cout << "Remove/Move under: ";
     std::cin >> limit;
-    cout << "Removing photos" << endl;
+    cout << "Removing/Moving photos" << endl;
     
     std::filesystem::path newFolder;
     if (command == 0)
@@ -100,9 +91,7 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
         std::filesystem::create_directory(newFolder);
     }
     else if (command == 2)
-    {
         newFolder = argv[2];
-    }
 
     if (command == 1)
     {
@@ -111,11 +100,10 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
             if (val < limit)
             {
                 cout << ".";
-                count += std::filesystem::remove(key);
+                countImg += std::filesystem::remove(key);
             }
         }
-        cout << "\nPhotos removed: " << count << endl;
-
+        cout << "\nPhotos removed: " << countImg << endl;
     }
     else
     {
@@ -126,14 +114,10 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
                 cout << ".";
                 auto newPath = newFolder/ key.filename();
                 std::filesystem::rename(key, newPath);
-                ++count;
+                ++countImg;
             }
         }
-        cout << "\nPhotos moved: " << count << endl;
-
+        cout << "\nPhotos moved: " << countImg << endl;
     }
-    
-
-       
     return 0;
 }
