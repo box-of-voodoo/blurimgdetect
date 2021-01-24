@@ -16,7 +16,7 @@ using std::endl;
 
 int main(int argc, char** argv)// help,-h,-help; -r; -m;
 {
-    int command = 0;
+    int command = 0; //0 default mode;1 remove;2 move
     if ((argc < 2) || strcmp(argv[1], "help") == 0 || strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "-h") == 0)
     {
         cout << "blurimgdetect.exe [-r||-m path_to_move] path_of_folder" << endl;
@@ -42,7 +42,6 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     cv::Mat image, eges;
     cv::Mat m, sd;
     cv::Mat out;
-    cv::Mat splitchannels[3];
     double suma = 0;
     double maxVal = DBL_MIN;
     double minVal = DBL_MAX;
@@ -50,22 +49,21 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     int countImg = 0;
     std::vector<double> stds;
     std::map<std::filesystem::path, double> imagesStd;
-    cout << "Processing images";
 
 #ifdef TIME_MEASURE
     auto start = std::chrono::high_resolution_clock::now();
 #endif
+    cout << "Processing images";
     for (const auto& file : std::filesystem::directory_iterator(imgFolder))
-    //for (const auto& file : std::filesystem::directory_iterator(pathX))
     {
-        image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file
-        if (!image.empty()) // Check for invalid input
+        image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file in gray scale
+        if (!image.empty()) // If image read or if is image
         {
             cout << ".";
-            cv::Laplacian(image, out, CV_64F);
-            cv::meanStdDev(out, m, sd);
-            double temp = (pow(*(double*)sd.data, 2.));
-            imagesStd[file.path()] = temp;
+            cv::Laplacian(image, out, CV_64F); //find egdes in image
+            cv::meanStdDev(out, m, sd); //compute standart deviation of edge
+            double temp = (pow(*(double*)sd.data, 2.)); //variance
+            imagesStd[file.path()] = temp; 
             minVal = MIN(minVal, temp);
             maxVal = MAX(maxVal, temp);
             suma += temp;
@@ -77,17 +75,24 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     cout << "Time calculating: " << time.count() << " ms" << endl;
 #endif
-
     cout << "Number of photos: " << imagesStd.size() << endl;
     cout << "Max value: " << maxVal << "\tMin value: " << minVal << "\tAverage value: " << suma / imagesStd.size() << endl;
-    cout << "Remove/Move under: ";
-    std::cin >> limit;
-    cout << "Removing/Moving photos" << endl;
-    
+    if (command != 1) 
+    {
+        cout << "Move under: ";
+        std::cin >> limit;
+        cout << "Moving photos" << endl;
+    }
+    else
+    {
+        cout << "Remove under: ";
+        std::cin >> limit;
+        cout << "Removing photos" << endl;
+    }
     std::filesystem::path newFolder;
     if (command == 0)
     {
-        newFolder = imgFolder/ "removed";
+        newFolder = imgFolder/ "blurred";
         std::filesystem::create_directory(newFolder);
     }
     else if (command == 2)
