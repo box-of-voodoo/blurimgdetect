@@ -6,6 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <map>
+#include "filterPhotos.h"
 
 //#define TIME_MEASURE
 #ifdef TIME_MEASURE
@@ -38,37 +39,40 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
         return 0;
     }
 
-    std::filesystem::path imgFolder(argv[command + 1]);
-    cv::Mat image, eges;
-    cv::Mat m, sd;
-    cv::Mat out;
-    double suma = 0;
-    double maxVal = DBL_MIN;
-    double minVal = DBL_MAX;
+    //std::filesystem::path imgFolder(argv[command + 1]);
+    //cv::Mat image, eges;
+    //cv::Mat m, sd;
+    //cv::Mat out;
+    //double suma = 0;
+    //double maxVal = DBL_MIN;
+    //double minVal = DBL_MAX;
     double limit = 0;
     int countImg = 0;
-    std::vector<double> stds;
-    std::map<std::filesystem::path, double> imagesStd;
+    filterPhotos test(argv[command + 1]);
+
 
 #ifdef TIME_MEASURE
     auto start = std::chrono::high_resolution_clock::now();
 #endif
     cout << "Processing images";
-    for (const auto& file : std::filesystem::directory_iterator(imgFolder))
-    {
-        image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file in gray scale
-        if (!image.empty()) // If image read or if is image
-        {
-            cout << ".";
-            cv::Laplacian(image, out, CV_64F); //find egdes in image
-            cv::meanStdDev(out, m, sd); //compute standart deviation of edge
-            double temp = (pow(*(double*)sd.data, 2.)); //variance
-            imagesStd[file.path()] = temp; 
-            minVal = MIN(minVal, temp);
-            maxVal = MAX(maxVal, temp);
-            suma += temp;
-        }
-    }
+    test.FindStdOfEdges();
+    std::map<std::filesystem::path, double> imagesStd(test.getPhotosStd());
+
+    //for (const auto& file : std::filesystem::directory_iterator(imgFolder))
+    //{
+    //    image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file in gray scale
+    //    if (!image.empty()) // If image read or if is image
+    //    {
+    //        cout << ".";
+    //        cv::Laplacian(image, out, CV_64F); //find egdes in image
+    //        cv::meanStdDev(out, m, sd); //compute standart deviation of edge
+    //        double temp = (pow(*(double*)sd.data, 2.)); //variance
+    //        imagesStd[file.path()] = temp; 
+    //        minVal = MIN(minVal, temp);
+    //        maxVal = MAX(maxVal, temp);
+    //        suma += temp;
+    //    }
+    //}
     cout << endl;
 #ifdef TIME_MEASURE
     auto end = std::chrono::high_resolution_clock::now();
@@ -76,53 +80,54 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     cout << "Time calculating: " << time.count() << " ms" << endl;
 #endif
     cout << "Number of photos: " << imagesStd.size() << endl;
-    cout << "Max value: " << maxVal << "\tMin value: " << minVal << "\tAverage value: " << suma / imagesStd.size() << endl;
-    if (command != 1) 
-    {
-        cout << "Move under: ";
-        std::cin >> limit;
-        cout << "Moving photos" << endl;
-    }
-    else
-    {
-        cout << "Remove under: ";
-        std::cin >> limit;
-        cout << "Removing photos" << endl;
-    }
-    std::filesystem::path newFolder;
-    if (command == 0)
-    {
-        newFolder = imgFolder/ "blurred";
-        std::filesystem::create_directory(newFolder);
-    }
-    else if (command == 2)
-        newFolder = argv[2];
+    cout << "Max value: " << test.maxVal << "\tMin value: " << test.minVal << "\tAverage value: " << test.average << endl;
+    //if (command != 1) 
+    //{
+    //    cout << "Move under: ";
+    //    std::cin >> limit;
+    //    cout << "Moving photos" << endl;
+    //}
+    //else
+    //{
+    //    cout << "Remove under: ";
+    //    std::cin >> limit;
+    //    cout << "Removing photos" << endl;
+    //}
 
-    if (command == 1)
-    {
-        for (const auto& [key, val] : imagesStd)
-        {
-            if (val < limit)
-            {
-                cout << ".";
-                countImg += std::filesystem::remove(key);
-            }
-        }
-        cout << "\nPhotos removed: " << countImg << endl;
-    }
-    else
-    {
-        for (const auto& [key, val] : imagesStd)
-        {
-            if (val < limit)
-            {
-                cout << ".";
-                auto newPath = newFolder/ key.filename();
-                std::filesystem::rename(key, newPath);
-                ++countImg;
-            }
-        }
-        cout << "\nPhotos moved: " << countImg << endl;
-    }
+    //std::filesystem::path newFolder;
+    //if (command == 0)
+    //{
+    //    newFolder = imgFolder/ "blurred";
+    //    std::filesystem::create_directory(newFolder);
+    //}
+    //else if (command == 2)
+    //    newFolder = argv[2];
+
+    //if (commandc == 1)
+    //{
+    //    for (const auto& [key, val] : imagesStd)
+    //    {
+    //        if (val < limit)
+    //        {
+    //            cout << ".";
+    //            countImg += std::filesystem::remove(key);
+    //        }
+    //    }
+    //    cout << "\nPhotos removed: " << countImg << endl;
+    //}
+    //else
+    //{
+    //    for (const auto& [key, val] : imagesStd)
+    //    {
+    //        if (val < limit)
+    //        {
+    //            cout << ".";
+    //            auto newPath = newFolder/ key.filename();
+    //            std::filesystem::rename(key, newPath);
+    //            ++countImg;
+    //        }
+    //    }
+    //    cout << "\nPhotos moved: " << countImg << endl;
+    //}
     return 0;
 }
