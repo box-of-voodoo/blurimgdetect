@@ -4,6 +4,7 @@
 #include <opencv2/highgui.hpp>
 #include <iostream>
 #include <string>
+#include <set>
 #include <filesystem>
 #include <map>
 #include "filterPhotos.h"
@@ -39,7 +40,7 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
         return 0;
     }
 
-    //std::filesystem::path imgFolder(argv[command + 1]);
+    std::filesystem::path imgFolder(argv[command + 1]);
     //cv::Mat image, eges;
     //cv::Mat m, sd;
     //cv::Mat out;
@@ -49,38 +50,40 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
     double limit = 0;
     int countImg = 0;
     filterPhotos test(argv[command + 1]);
-
-
-#ifdef TIME_MEASURE
-    auto start = std::chrono::high_resolution_clock::now();
-#endif
-    cout << "Processing images";
-    test.FindStdOfEdges();
-    std::map<std::filesystem::path, double> imagesStd(test.getPhotosStd());
-
-    //for (const auto& file : std::filesystem::directory_iterator(imgFolder))
-    //{
-    //    image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file in gray scale
-    //    if (!image.empty()) // If image read or if is image
-    //    {
-    //        cout << ".";
-    //        cv::Laplacian(image, out, CV_64F); //find egdes in image
-    //        cv::meanStdDev(out, m, sd); //compute standart deviation of edge
-    //        double temp = (pow(*(double*)sd.data, 2.)); //variance
-    //        imagesStd[file.path()] = temp; 
-    //        minVal = MIN(minVal, temp);
-    //        maxVal = MAX(maxVal, temp);
-    //        suma += temp;
-    //    }
-    //}
-    cout << endl;
-#ifdef TIME_MEASURE
-    auto end = std::chrono::high_resolution_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    cout << "Time calculating: " << time.count() << " ms" << endl;
-#endif
-    cout << "Number of photos: " << imagesStd.size() << endl;
-    cout << "Max value: " << test.maxVal << "\tMin value: " << test.minVal << "\tAverage value: " << test.average << endl;
+//
+//
+//#ifdef TIME_MEASURE
+//    auto start = std::chrono::high_resolution_clock::now();
+//#endif
+//    cout << "Processing images";
+//    test.FindStdOfEdges();
+//    std::map<std::filesystem::path, double> imagesStd(test.getPhotosStd());
+//
+//    //for (const auto& file : std::filesystem::directory_iterator(imgFolder))
+//    //{
+//    //    image = cv::imread(file.path().string(), cv::IMREAD_GRAYSCALE); // Read the file in gray scale
+//    //    if (!image.empty()) // If image read or if is image
+//    //    {
+//    //        cout << ".";
+//    //        cv::Laplacian(image, out, CV_64F); //find egdes in image
+//    //        cv::meanStdDev(out, m, sd); //compute standart deviation of edge
+//    //        double temp = (pow(*(double*)sd.data, 2.)); //variance
+//    //        imagesStd[file.path()] = temp; 
+//    //        minVal = MIN(minVal, temp);
+//    //        maxVal = MAX(maxVal, temp);
+//    //        suma += temp;
+//    //    }
+//    //}
+//    cout << endl;
+//#ifdef TIME_MEASURE
+//    auto end = std::chrono::high_resolution_clock::now();
+//    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+//    cout << "Time calculating: " << time.count() << " ms" << endl;
+//#endif
+//    cout << "Number of photos: " << imagesStd.size() << endl;
+//    cout << "Max value: " << test.maxVal << "\tMin value: " << test.minVal << "\tAverage value: " << test.average << endl;
+//    
+    test.similarHist();
     //if (command != 1) 
     //{
     //    cout << "Move under: ";
