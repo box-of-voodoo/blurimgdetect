@@ -84,6 +84,7 @@ int main(int argc, char** argv)// help,-h,-help; -r; -m;
 //    cout << "Max value: " << test.maxVal << "\tMin value: " << test.minVal << "\tAverage value: " << test.average << endl;
 //    
     test.similarHist();
+    
     //if (command != 1) 
     //{
     //    cout << "Move under: ";
